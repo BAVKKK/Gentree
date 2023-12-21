@@ -33,11 +33,11 @@ def UserRegistrationView(request):
 
 def UserProfileView(request):
     if request.method == 'POST':
-        form = UserProfileForm(data=request.POST)
+        form = UserProfileForm(instance=request.user, data=request.POST, files=request.FILES)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('users:login'))
+            return HttpResponseRedirect(reverse('index'))
     else:
-        form = UserProfileForm()
+        form = UserProfileForm(instance=request.user)
     context =  {'form': form}
     return render(request, 'profile.html', context)

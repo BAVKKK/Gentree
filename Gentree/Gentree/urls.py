@@ -22,9 +22,13 @@ from django.urls import include, path
 from app.views import *
 from users.views import *
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', IndexView, name='index'),
     path('app/', include('app.urls', namespace='app')),
     path('users/', include('users.urls', namespace='users')),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
