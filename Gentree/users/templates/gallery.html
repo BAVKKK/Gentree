@@ -1,0 +1,20 @@
+{% extends 'base1.html' %}
+{% load static %}
+
+{% block content %}
+  <h2>Галерея</h2>
+  <p><a href="{% url 'users:upload_image' %}">Загрузить изображение</a></p>
+  <div class="row">
+    {% for image in images %}
+      <div class="col-lg-3 col-md-4 col-6">
+        <div class="text-center">
+          <img width="30%" height="auto" src="{{ image.images.url }}" class="img-thumbnail">
+          <form method="post" action="{% url 'users:delete_image' image.id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <button type="submit">Удалить</button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

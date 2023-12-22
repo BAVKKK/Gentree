@@ -1,0 +1,68 @@
+django.core.exceptions.ImproperlyConfigured: Application labels aren't unique, duplicates: users
+
+# users/models.py
+# from django.db import models
+# from django.contrib.auth.models import AbstractUser
+
+# class User(AbstractUser):
+#     image = models.ImageField(upload_to='users_images', null=True, blank=True)
+#     # Другие поля вашей модели
+
+# class UserProfile(models.Model):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     bio = models.TextField(blank=True)
+
+# class UserGallery(models.Model):
+#     user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, blank=True)
+#     image = models.ImageField(upload_to='user_galleries/', blank=True, null=True)
+
+    # users/signals.py
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib.auth import get_user_model
+from .models import UserProfile, UserGallery
+
+User = get_user_model()
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.userprofile.save()
+
+@receiver(post_save, sender=User)
+def create_user_gallery(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+# users/apps.py
+from django.apps import AppConfig
+
+class UsersConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'users'
+
+    def ready(self):
+        import users.signals
+
+# settings.py
+INSTALLED_APPS = [
+    # ...
+    'users.apps.UsersConfig',
+]
+
+
+# users/urls.py
+from django.urls import path
+from .views import gallery, upload_image, delete_image
+
+app_name = 'users'
+
+urlpatterns = [
+    path('gallery/', gallery, name='gallery'),
+    path('upload/', upload_image, name='upload_image'),
+    path('delete/<int:image_id>/', delete_image, name='delete_image'),
+]

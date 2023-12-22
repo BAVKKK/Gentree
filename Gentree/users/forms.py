@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserChangeForm, UserCreationForm
 
-from users.models import User
+from users.models import User, UserGallery
 # from users.tasks import send_email_verification
 
 
@@ -28,10 +28,15 @@ class UserRegistrationForm(UserCreationForm):
 class UserProfileForm(UserChangeForm):
     first_name = forms.CharField()
     last_name = forms.CharField()
-    email = forms.CharField()
+    email = forms.CharField(widget=forms.EmailInput(), required=False)
     image = forms.ImageField(widget=forms.FileInput(), required=False)
+    password = forms.CharField(widget=forms.HiddenInput, required=False)
+    
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'image', 'email')
 
-    
+class ImageUploadForm(forms.ModelForm):
+    class Meta:
+        model = UserGallery
+        fields = ['images']
